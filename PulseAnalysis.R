@@ -36,7 +36,7 @@ pve <-100*pr.out$sdev^2/sum(pr.out$sdev^2)
 
 library(ggplot2)
 pve.df = as.data.frame(cbind(1:length(pve),cumsum(pve)))
-ggplot(data = pve.df, aes(x = pve.df[1:length(pve),1], y =pve.df[1:length(pve),2])) + geom_point(color="navyblue") + geom_line(color="navyblue") + labs(x = "Principal Component", y = "Cumulative PVE")
+ggplot(data = pve.df, aes(x = pve.df[1:length(pve),1], y =pve.df[1:length(pve),2])) + geom_point(color="navyblue") + geom_line(color="navyblue") + geom_area(fill="navyblue",alpha = 0.5) + labs(x = "Principal Component", y = "Cumulative PVE")
 
 ### Exploring of PCs coefficients according to variables
 pr.out$rotation
