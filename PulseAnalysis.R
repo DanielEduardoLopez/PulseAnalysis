@@ -44,8 +44,6 @@ head(pr.out$x)
 
 
 ### Plotting the scores
-### General way to interpret a PC is using the scores
-
 
 ### Converting datasets into data frame for plotting
 po.df = as.data.frame(pr.out$x[,1:3])
@@ -90,20 +88,44 @@ ggplot() + geom_point(data = po.df, aes(x = PC1, y = PC3, color  = pulse.gender)
 
 ## 2. Cluster analysis
 
-par ( mfrow =c(1 ,1) )
+### Data Scaling
 sd.data<-scale(pulse.data, center = FALSE , scale = TRUE) #The variables have been scaled
-data.dist<-dist(sd.data) #Compute the matrix of distances of observations
+
+### Computation of distances matrix
+data.dist<-dist(sd.data) 
+
+### Hierarchical Clustering with the Complete Linkage Method (The most used)
 clustcomp <- hclust(data.dist, method = "complete")
-plot(hclust(data.dist),  main ="Complete Linkage", xlab ="", sub ="", ylab ="", cex = 0.75) # The complete linkage is the most used
+plot(clustcomp,  main ="Complete Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
+
+#install.packages("ggdendro")
+library("ggdendro")
+
+# Building of dendrogram object from hclust results
+dend <- as.dendrogram(clustcomp)
+# Data extraction for rectangular lines
+dend_data <- dendro_data(dend, type = "rectangle")
+
+ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dend_data$labels, aes(x, y, label = label),
+            hjust = 1, angle = 90, size = 3) + labs(title="Complete Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+### Hierarchical Clustering with the Average Linkage Method 
 clustav <- hclust(data.dist, method = "average")
-plot(hclust(data.dist, method ="average"), main ="Average Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
+plot(clustav, main ="Average Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
+
+### Hierarchical Clustering with the Single Linkage Method 
 clustsin <- hclust(data.dist, method = "single")
-plot(hclust(data.dist, method ="single"), main ="Single Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
+plot(clustsin, main ="Single Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
 
 # Dunn's Index
 library(clValid)
+
 clustc <- cutree(clustcomp, 8)
 dunn(data.dist, clustc)
+
 clusta <- cutree(clustav, 7)
 dunn(data.dist, clusta)
 
