@@ -96,29 +96,42 @@ data.dist<-dist(sd.data)
 
 ### Hierarchical Clustering with the Complete Linkage Method (The most used)
 clustcomp <- hclust(data.dist, method = "complete")
-plot(clustcomp,  main ="Complete Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
 
 #install.packages("ggdendro")
 library("ggdendro")
 
 # Building of dendrogram object from hclust results
-dend <- as.dendrogram(clustcomp)
+dendcomp <- as.dendrogram(clustcomp)
 # Data extraction for rectangular lines
-dend_data <- dendro_data(dend, type = "rectangle")
+dendcomp_data <- dendro_data(dendcomp, type = "rectangle")
 
-ggplot(dend_data$segments) + 
+ggplot(dendcomp_data$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
-  geom_text(data = dend_data$labels, aes(x, y, label = label),
+  geom_text(data = dendcomp_data$labels, aes(x, y, label = label),
             hjust = 1, angle = 90, size = 3) + labs(title="Complete Linkage", x="", y="" ) + 
   theme(plot.title = element_text(hjust = 0.5))
 
 ### Hierarchical Clustering with the Average Linkage Method 
 clustav <- hclust(data.dist, method = "average")
-plot(clustav, main ="Average Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
+dendav <- as.dendrogram(clustav)
+dendav_data <- dendro_data(dendav, type = "rectangle")
+ggplot(dendav_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendav_data$labels, aes(x, y, label = label),
+            hjust = 1, angle = 90, size = 3) + labs(title="Average Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
 
 ### Hierarchical Clustering with the Single Linkage Method 
 clustsin <- hclust(data.dist, method = "single")
-plot(clustsin, main ="Single Linkage", xlab ="", sub ="", ylab ="", cex = 0.75)
+dendsin <- as.dendrogram(clustsin)
+dendsin_data <- dendro_data(dendsin, type = "rectangle")
+ggplot(dendsin_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendsin_data$labels, aes(x, y, label = label),
+            hjust = 1, angle = 90, size = 3) + labs(title="Single Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
 
 # Dunn's Index
 library(clValid)
@@ -135,27 +148,37 @@ hc.out<-hclust(dist(sd.data))
 hc.clusters<-cutree(hc.out,8)
 table(hc.clusters, pulse.gender)
 
-par(mfrow =c(1,1))
-plot(hc.out, labels = pulse.gender, main ="Hierarchical Cluster Dendogram", cex = 0.75)
-abline(h=0.5, col ="red")
+ggplot(dendcomp_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendcomp_data$labels, aes(x, y, label = pulse.gender),
+            hjust = 1, angle = 90, size = 3) + labs(title="Complete Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5)) + geom_hline(aes(yintercept = 0.5), color = "red") +
+  ylim(-0.10,1.05)
+  
 
 #K-means
 
 set.seed(2) #We need to fix the seed
-km.out<-kmeans(sd.data, 8, nstart = 20)  # 4 is the  desired number of clusters, 20 is the number of iterations
+km.out<-kmeans(sd.data, 4, nstart = 20)  # 4 is the  desired number of clusters, 20 is the number of iterations
 km.out
 km.clusters<-km.out$cluster
 table(km.clusters, pulse.gender)
-
 table(km.clusters, hc.clusters)
 
 
 # k-means with PC
+clustpca <- hclust(dist(pr.out$x[,1:3]), method = "complete")
+table(cutree(clustpca,8), pulse.gender)
 
-hc.out<-hclust(dist(pr.out$x [,1:3]))
-plot(hc.out, labels = pulse.gender, main ="Hier. Clust. on 3 Score Vectors")
-abline(h=3.9, col ="red")
-table(cutree(hc.out,8), pulse.gender)
+
+dendpca <- as.dendrogram(clustpca)
+dendpca_data <- dendro_data(dendpca, type = "rectangle")
+ggplot(dendpca_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendpca_data$labels, aes(x, y, label = pulse.gender),
+            hjust = 1, angle = 90, size = 3) + labs(title="Hier. Clust. on 3 Score Vectors", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5)) + geom_hline(aes(yintercept = 3.9), color = "red") +
+  ylim(-0.15,9.05)
 
 
 
