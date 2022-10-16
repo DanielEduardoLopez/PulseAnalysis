@@ -1,17 +1,19 @@
-# PULSE ANALYSIS: Unsupervised Learning
+# PULSE ANALYSIS: Unsupervised Learning Analysis
 
 # By: Daniel Eduardo López Martínez
 # GitHub: https://github.com/DanielEduardoLopez
 # LinkedIn: https://www.linkedin.com/in/daniel-eduardo-lopez/ 
-# Date: "10/10/2022"
+# Date: "15/10/2022"
 
 
 ## 1. Data loading
 load("pulse.RData")
 
+
 ## 2. Data exploration
 head(pulse)
 summary(pulse)
+
 
 ## 3. Data wrangling
 restPulse=pulse$restPulse
@@ -24,6 +26,7 @@ bmi=pulse$bmi
 pulse.data = cbind(restPulse, actiPulse, heig, weig, bmi)
 pulse.gender = pulse$gender
 pulse.act = pulse$acti
+
 
 ## 1. Principal Component Analysis (PCA)
 
@@ -45,7 +48,7 @@ head(pr.out$x)
 
 ### Plotting the scores
 
-### Converting datasets into data frame for plotting
+### Converting datasets into data frames for plotting
 po.df = as.data.frame(pr.out$x[,1:3])
 pr.df = as.data.frame(pr.out$rotation[,1:3])
 
@@ -58,7 +61,6 @@ ggplot(data = po.df) + geom_point(aes(x = PC1, y = PC2, color  = pulse.gender)) 
 ggplot(data = po.df) + geom_point(aes(x = PC1, y = PC3, color  = pulse.gender)) + labs(x = "Z1", y = "Z3", color = "Gender") + geom_hline(aes(yintercept = 0), color = "gray") +  geom_vline(aes(xintercept = 0), color  = "gray") + theme(legend.position = "right") + scale_color_manual(values = colors)
 
 ggplot(data = po.df) + geom_point(aes(x = PC2, y = PC3, color  = pulse.gender)) + labs(x = "Z2", y = "Z3", color = "Gender") + geom_hline(aes(yintercept = 0), color = "gray") +  geom_vline(aes(xintercept = 0), color  = "gray") + theme(legend.position = "right") + scale_color_manual(values = colors)
-
 
 ### Biplots
 
@@ -94,46 +96,53 @@ sd.data<-scale(pulse.data, center = FALSE , scale = TRUE) #The variables have be
 ### Computation of distances matrix
 data.dist<-dist(sd.data) 
 
-### Hierarchical Clustering with the Complete Linkage Method (The most used)
+
+### 2.1 Hierarchical Clustering
+
+#### Hierarchical Clustering with the Complete Linkage Method (The most used)
 clustcomp <- hclust(data.dist, method = "complete")
 
-#install.packages("ggdendro")
+####install.packages("ggdendro")
 library("ggdendro")
 
-# Building of dendrogram object from hclust results
+#### Building of dendrogram object from hclust results
 dendcomp <- as.dendrogram(clustcomp)
-# Data extraction for rectangular lines
+
+#### Data extraction for rectangular lines
 dendcomp_data <- dendro_data(dendcomp, type = "rectangle")
 
+#### Dendrogram plot with Complete Linkage
 ggplot(dendcomp_data$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
   geom_text(data = dendcomp_data$labels, aes(x, y, label = label),
             hjust = 1, angle = 90, size = 3) + labs(title="Complete Linkage", x="", y="" ) + 
   theme(plot.title = element_text(hjust = 0.5))
 
-### Hierarchical Clustering with the Average Linkage Method 
+#### Hierarchical Clustering with the Average Linkage Method 
 clustav <- hclust(data.dist, method = "average")
 dendav <- as.dendrogram(clustav)
 dendav_data <- dendro_data(dendav, type = "rectangle")
+
+#### Dendrogram plot with Average Linkage
 ggplot(dendav_data$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
   geom_text(data = dendav_data$labels, aes(x, y, label = label),
             hjust = 1, angle = 90, size = 3) + labs(title="Average Linkage", x="", y="" ) + 
   theme(plot.title = element_text(hjust = 0.5))
 
-
-### Hierarchical Clustering with the Single Linkage Method 
+#### Hierarchical Clustering with the Single Linkage Method 
 clustsin <- hclust(data.dist, method = "single")
 dendsin <- as.dendrogram(clustsin)
 dendsin_data <- dendro_data(dendsin, type = "rectangle")
+
+#### Dendrogram plot with Single Linkage
 ggplot(dendsin_data$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
   geom_text(data = dendsin_data$labels, aes(x, y, label = label),
             hjust = 1, angle = 90, size = 3) + labs(title="Single Linkage", x="", y="" ) + 
   theme(plot.title = element_text(hjust = 0.5))
 
-
-# Dunn's Index
+#### Dunn's Index
 library(clValid)
 
 clustc <- cutree(clustcomp, 8)
@@ -142,10 +151,11 @@ dunn(data.dist, clustc)
 clusta <- cutree(clustav, 7)
 dunn(data.dist, clusta)
 
+clusts <- cutree(clustsin, 7)
+dunn(data.dist, clusts)
 
-#Complete linkage
-hc.out<-hclust(dist(sd.data))
-hc.clusters<-cutree(hc.out,8)
+#### Dendrogram plot using complete linkage and labeled by gender
+hc.clusters<-cutree(clustcomp,8)
 table(hc.clusters, pulse.gender)
 
 ggplot(dendcomp_data$segments) + 
@@ -153,32 +163,33 @@ ggplot(dendcomp_data$segments) +
   geom_text(data = dendcomp_data$labels, aes(x, y, label = pulse.gender),
             hjust = 1, angle = 90, size = 3) + labs(title="Complete Linkage", x="", y="" ) + 
   theme(plot.title = element_text(hjust = 0.5)) + geom_hline(aes(yintercept = 0.5), color = "red") +
-  ylim(-0.10,1.05)
+  ylim(-0.10,1.4)
   
 
-#K-means
+### 2.2 K-means Clustering
 
-set.seed(2) #We need to fix the seed
+#### K-means Clustering on scaled data
+set.seed(2)
 km.out<-kmeans(sd.data, 4, nstart = 20)  # 4 is the  desired number of clusters, 20 is the number of iterations
 km.out
+
+#### Examining gender by clusters
 km.clusters<-km.out$cluster
 table(km.clusters, pulse.gender)
+
+#### Comparing the K-means and Hierarchical clustering
 table(km.clusters, hc.clusters)
 
-
-# k-means with PC
+#### Hierarchical clustering with principal components
 clustpca <- hclust(dist(pr.out$x[,1:3]), method = "complete")
 table(cutree(clustpca,8), pulse.gender)
 
-
+#### Dendrogram plot with principal components
 dendpca <- as.dendrogram(clustpca)
 dendpca_data <- dendro_data(dendpca, type = "rectangle")
 ggplot(dendpca_data$segments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
   geom_text(data = dendpca_data$labels, aes(x, y, label = pulse.gender),
-            hjust = 1, angle = 90, size = 3) + labs(title="Hier. Clust. on 3 Score Vectors", x="", y="" ) + 
+            hjust = 1, angle = 90, size = 3) + labs(title="Hierarchical Clustering on 3 Score Vectors", x="", y="" ) + 
   theme(plot.title = element_text(hjust = 0.5)) + geom_hline(aes(yintercept = 3.9), color = "red") +
-  ylim(-0.15,9.05)
-
-
-
+  ylim(-0.3,8)
