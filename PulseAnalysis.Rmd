@@ -1,0 +1,313 @@
+---
+title: "Pulse Analysis"
+author: 
+  - Daniel Eduardo López^[https://github.com/DanielEduardoLopez, https://www.linkedin.com/in/daniel-eduardo-lopez/]
+date: "15/10/2022"
+output: 
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## 1. Goal
+
+In the present report, the relationship among the **pulse at rest**, **pulse in activity**, **height**, **weight**, and **body mass index** of a group of **male** and **female** patients was assessed.
+
+The question to answer was: **How do these variables relate among each other and with patients' gender?**
+
+
+## 2. Analytic Approach
+
+Unsupervised learning techniques such as Principal Component Analysis (PCA) and Clustering Analysis were applied to infer relationships among the variables in study. 
+
+
+## 3. Data Requirements
+
+Accordingly, patients' data about the variables pulse at rest (restPulse), pulse in activity (actiPulse), height (heig), weight (weig) and Body Mass Index (bmi) was needed.
+
+
+## 4. Data Collection
+
+The data was provided by the **University of Zaragoza** in the course of the **Master's in Quantitative Biotechnology** 2020-2021.
+
+
+## 5. Data Understanding & Preparation
+
+First, data was loaded into R:
+
+```{r}
+load("pulse.RData")
+summary(pulse)
+```
+
+Then, the variables of interest were retrieved from the data to construct a new dataset:
+
+```{r}
+restPulse = pulse$restPulse
+actiPulse = pulse$actiPulse
+heig = pulse$heig
+weig = pulse$weig
+bmi = pulse$bmi
+
+pulse.gender = pulse$gender
+pulse.act = pulse$acti
+pulse.data = cbind(restPulse, actiPulse, heig, weig, bmi)
+head(pulse.data)
+```
+
+So, the new dataset only includes the variables of interest: restPulse, actiPulse, heig , weig and bmi.
+
+
+## 6. Modeling & Evaluation
+
+### 6.1. Principal Component Analysis
+
+As a first approach, a Principal Component Analysis (PCA) was performed in order to explore the data.
+
+```{r}
+pr.out<-prcomp(pulse.data, scale = TRUE)
+summary(pr.out)
+head(pr.out$x)
+```
+
+In order to explain at least 90% of variance from the data, a suitable number of principal components was selected according to the criterion of the Cumulative Percentage of Variance Explained (PVE), plotted in the following figure:
+
+```{r}
+pve <-100*pr.out$sdev^2/sum (pr.out$sdev^2)
+
+library(ggplot2)
+pve.df = as.data.frame(cbind(1:length(pve),cumsum(pve)))
+ggplot(data = pve.df, aes(x = pve.df[1:length(pve),1], y =pve.df[1:length(pve),2])) + geom_point(color="navyblue") + geom_line(color="navyblue") + geom_area(fill="navyblue",alpha = 0.5) + labs(x = "Principal Component", y = "Cumulative PVE")
+```
+
+Thus, in view of the former figure, 3 principal components are required to explain at least 90% of variance from the data, effectively reducing the dimension of the dataset from 6 variables to only 3. 
+
+To interpret the resulting components, it is useful to check the coefficients of each component according to the variables:
+
+```{r}
+pr.out$rotation
+```
+
+In this context, we can see that the PC1 is positively correlated to the variables restPulse (0.3201933) and actiPulse (0.2948346) and negatively correlated to the variables heig (-0.4890108), weig (-0.6055892) and bmi (-0.4524146). On the other hand, PC2 is positively correlated with all the variables and PC3 is negatively correlated with all the variables except bmi.
+
+Thus, we may infer that the PC1 will be the most useful to look for relationships within the data in the analysis below.
+
+Furthermore, as we have reduced the dimensions from 6 to 3, we may interpret that, indeed, the variables are somewhat correlated.
+
+Then, the observations were represented graphically in the new reduced space, differentiating between the gender of the patients in the plots.
+
+```{r}
+# Converting datasets into data frames for plotting
+po.df = as.data.frame(pr.out$x[,1:3])
+pr.df = as.data.frame(pr.out$rotation[,1:3])
+
+# Set of colors for female and male patients
+colors <- c("female" = "#4393C3", "male" = "#D6604D")
+
+# Score Plot of Z1 vs Z2
+ggplot(data = po.df) + geom_point(aes(x = PC1, y = PC2, color  = pulse.gender)) + labs(x = "Z1", y = "Z2", color = "Gender") + geom_hline(aes(yintercept = 0), color = "gray") +  geom_vline(aes(xintercept = 0), color  = "gray") + theme(legend.position = "right") + scale_color_manual(values = colors)
+
+# Score Plot of Z1 vs Z3
+ggplot(data = po.df) + geom_point(aes(x = PC1, y = PC3, color  = pulse.gender)) + labs(x = "Z1", y = "Z3", color = "Gender") + geom_hline(aes(yintercept = 0), color = "gray") +  geom_vline(aes(xintercept = 0), color  = "gray") + theme(legend.position = "right") + scale_color_manual(values = colors)
+
+# Score Plot of Z2 vs Z3
+ggplot(data = po.df) + geom_point(aes(x = PC2, y = PC3, color  = pulse.gender)) + labs(x = "Z2", y = "Z3", color = "Gender") + geom_hline(aes(yintercept = 0), color = "gray") +  geom_vline(aes(xintercept = 0), color  = "gray") + theme(legend.position = "right") + scale_color_manual(values = colors)
+
+
+```
+
+From the plots of Z1 vs Z2 and Z1 vs Z3, it is possible to clearly distinguish that the principal component 1 is able to capture the relationship between the gender of the patients and the data. In particular, the PC1 is positively correlated with the female gender and negatively correlated with the male gender, thus generating two distinct groups. 
+
+Therefore, if we recall that PC1 is positively correlated with the variables restPulse (0.3201933) and actiPulse (0.2948346) and negatively correlated to the variables heig (-0.4890108), weig (-0.6055892) and bmi (-0.4524146); we may infer that the female patients tend to exhibit a higher restPulse and actiPulse but smaller values of height, weight and bmi; which is reasonable as women tend to have lowers values of height, weight and bmi in comparison to men.
+
+In this sense, we can also interpret that male patients tend to have a smaller restPulse and actiPulse but higher values of height, weight and bmi which, again, is reasonable according to the reasoning exposed above.
+
+On the other hand, the plot of Z2 vs Z3 fails in generating a clear pattern between the observations and the gender of the patients.
+
+This interpretation is coherent if we take a look to the biplots of Z1 vs Z2 and Z1 vs Z3:
+
+```{r}
+
+# Function for adjusting the position of the labels in the biplots
+labeladj = function(v){
+  counter = 1
+  for (i in v){
+  if (i >= 0){
+    v[counter] = i + 0.1
+  }
+  if (i < 0){
+    v[counter] = i - 0.1
+  }
+  counter = counter + 1
+  }
+  return(v)
+}
+
+# Z1 vs Z2
+scale = 4
+ggplot() + geom_point(data = po.df, aes(x = PC1, y = PC2, color  = pulse.gender)) + labs(x = "Z1", y = "Z2", color = "Gender") + geom_hline(aes(yintercept = 0), color = "#2e2d2d") +  geom_vline(aes(xintercept = 0), color  = "#2e2d2d") + theme(legend.position = "right") + scale_color_manual(values = colors) + geom_segment(data = pr.df, aes(x = 0, y = 0, xend = PC1*scale, yend = PC2*scale), arrow = arrow(length = unit(0.5, "cm")), color = "navyblue", size = 1) + geom_label(data = pr.df, aes(label=as.character(rownames(pr.df)), x=labeladj(PC1*scale), y = labeladj(PC2*scale)), label.size = NA, size=4, fill = NA)
+
+# Z1 vs Z3
+scale = 2.5
+ggplot() + geom_point(data = po.df, aes(x = PC1, y = PC3, color  = pulse.gender)) + labs(x = "Z1", y = "Z3", color = "Gender") + geom_hline(aes(yintercept = 0), color = "#2e2d2d") +  geom_vline(aes(xintercept = 0), color  = "#2e2d2d") + theme(legend.position = "right") + scale_color_manual(values = colors) + geom_segment(data = pr.df, aes(x = 0, y = 0, xend = PC1*scale, yend = PC3*scale), arrow = arrow(length = unit(0.5, "cm")), color = "navyblue", size = 1) + geom_label(data = pr.df, aes(label=as.character(rownames(pr.df)), x=labeladj(PC1*scale), y = labeladj(PC3*scale)), label.size = NA, size=4, fill = NA)
+
+```
+
+In view of the two previous biplots, it is possible to interpret that, indeed, the observations from the female patients are associated with higher values for  restPulse and actiPulse, while being also associated with lower values for weigth, height and bmi. On the contrary, the observations from the male patients are associated with lower values for  restPulse and actiPulse, while being also associated with higher values for weigth, height and bmi. 
+
+With these relationships in mind, it would be possible, for instance, to design a further test of hypothesis to compare the means of the observations from male and female patients in one or several of the variables assessed in this analysis.
+
+Thus, we may conclude that the current PCA analysis was successful in to capture some important relationships within the observations and the gender in the data, which shows the great potential that this statistical technique have as an exploratory tool for datasets with many variables.
+
+
+### 6.2. Clustering Analysis
+
+Afterwards, a cluster analysis was performed to the data. To do so, first, a hierarchical cluster analysis was applied in order to select the most suitable number of clusters.
+
+```{r}
+
+# Data scaling
+sd.data<-scale(pulse.data, center = FALSE , scale = TRUE) 
+
+# Computation of distances matrix
+data.dist<-dist(sd.data) 
+
+# Hierarchical Clustering with the Complete Linkage Method
+clustcomp <- hclust(data.dist, method = "complete")
+
+library("ggdendro")
+
+# Dendrogram plot with Complete Linkage
+dendcomp <- as.dendrogram(clustcomp)
+dendcomp_data <- dendro_data(dendcomp, type = "rectangle")
+ggplot(dendcomp_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendcomp_data$labels, aes(x, y, label = label),
+            hjust = 1, angle = 90, size = 2) + labs(title="Complete Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Hierarchical Clustering with the Average Linkage Method 
+clustav <- hclust(data.dist, method = "average")
+dendav <- as.dendrogram(clustav)
+dendav_data <- dendro_data(dendav, type = "rectangle")
+
+# Dendrogram plot with Average Linkage
+ggplot(dendav_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendav_data$labels, aes(x, y, label = label),
+            hjust = 1, angle = 90, size = 2) + labs(title="Average Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Hierarchical Clustering with the Single Linkage Method 
+clustsin <- hclust(data.dist, method = "single")
+dendsin <- as.dendrogram(clustsin)
+dendsin_data <- dendro_data(dendsin, type = "rectangle")
+
+# Dendrogram plot with Single Linkage
+ggplot(dendsin_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendsin_data$labels, aes(x, y, label = label),
+            hjust = 1, angle = 90, size = 2) + labs(title="Single Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+From the three dendrograms plotted above, the ones that generates the most distinguishable clusters were the ones constructed with the Complete Linkage and the Average Linkage methods, yielding about 8 and 7 subgroups, respectively. On the other hand, in the Single Linkage method it is not possible to easily differentiate the clusters so it will be discarded from further analysis. 
+
+In order to evaluate the goodness of clusterings generated, it is possible to use the Dunn’s Index; which is the ratio between the minimum inter-cluster distances to the maximum intra-cluster diameter. The diameter of a cluster is the distance between its two furthermost points. In order to have well separated and compact clusters, it is necessary to aim for a higher Dunn’s index.
+
+```{r}
+library(clValid)
+
+# Dunn's Index for the Hierarchical Clustering with Complete Linkage method
+clustc <- cutree(clustcomp, 8)
+dunn(data.dist, clustc)
+
+# Dunn's Index for the Hierarchical Clustering with Average Linkage method
+clusta <- cutree(clustav, 7)
+dunn(data.dist, clusta)
+```
+
+As shown by the Dunn function, the Dunn’s Index is higher for the Complete Linkage method. 
+
+In this context, as the Complete Linkage method exhibited the highest Dunn’s Index value, the clusters are more distinguishable and it is the linkage technique most used in cluster analysis, this method was selected as the most suitable for the next analysis.
+
+So, by building a table with the results using the Complete Linkage method and 8 clusters, the following characterization according to the gender of each patient was obtained:
+
+```{r}
+hc.clusters<-cutree(clustcomp,8)
+table(hc.clusters, pulse.gender)
+```
+
+And the following labeled dendrogram according to the gender of each patient was generated:
+
+```{r}
+ggplot(dendcomp_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendcomp_data$labels, aes(x, y, label = pulse.gender),
+            hjust = 1, angle = 90, size = 2) + labs(title="Complete Linkage", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5)) + geom_hline(aes(yintercept = 0.5), color = "red") +
+  ylim(-0.10,1.4)
+```
+
+After selecting the number of clusters from the Hierarchical Cluster Analysis, the K-means Cluster Analysis was applied with 8 clusters, using a set.seed(2) and nstart = 20.
+
+```{r}
+set.seed(2) 
+km.out<-kmeans(sd.data, 8, nstart = 20)
+km.out
+```
+
+Then, the gender of the patients was examined by cluster.
+
+```{r}
+km.clusters<-km.out$cluster
+table(km.clusters, pulse.gender)
+```
+
+Afterwards, a comparison of the results from the Hierarchical Clustering and the K-means Cluster Analysis was summarized in the following table:
+
+```{r}
+table(km.clusters, hc.clusters)
+```
+
+Finally, a Hierarchical Clustering Analysis was performed based on the already calculated principal components.
+
+```{r}
+# Hierarchical Clustering Analysis with PC
+clustpca <- hclust(dist(pr.out$x[,1:3]), method = "complete")
+table(cutree(clustpca,8), pulse.gender)
+
+# Dendrogram plot with principal components
+dendpca <- as.dendrogram(clustpca)
+dendpca_data <- dendro_data(dendpca, type = "rectangle")
+ggplot(dendpca_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend), color = "navyblue")+
+  geom_text(data = dendpca_data$labels, aes(x, y, label = pulse.gender),
+            hjust = 1, angle = 90, size = 2) + labs(title="Hierarchical Clustering on 3 Score Vectors", x="", y="" ) + 
+  theme(plot.title = element_text(hjust = 0.5)) + geom_hline(aes(yintercept = 3.9), color = "red") +
+  ylim(-0.3,8)
+```
+
+From the whole cluster analysis, we can observe that the clusters generated from both the Hierarchical analysis and the K-means analysis somewhat coincide. For instance, from the former table, both methods share 20 elements in their respective cluster 2 and 14 elements in their respective cluster 4. 
+
+It is also noteworthy that, indeed, both cluster methods were able to group the gender of the patients in mostly homogeneous subgroups. For example, in the hierarchical clustering, the clusters 1, 2 and 4 are mostly made of male patients; while the clusters 3, 5, 6 and 8 are mostly made of female patients.
+
+Likewise, in the k-means method, the clusters 2,5 and 6 are mostly made of male patients; while the clusters 1, 3 and 8 are mostly made of female patients.
+
+Furthermore, the Hierarchical Clustering Analysis based on the principal components also yielded a similar behavior than the previous clusters, as some clusters groups a majority of male patients whereas others groups a majority of female ones.
+
+Thus, the clustering analysis has proved to be useful in to relate some subgroups of observations in terms of the gender of the patients, which is also consistent with the findings from the PCA.
+
+
+## 7. Conclusions
+
+Pulse at rest and pulse in activity are negatively correlated with the weight, height and body mass index in both male and female patients. 
+
+On the other hand, female patients had a tendency to exhibit lower values of weight, height and body mass index and higher values of pulse at rest and pulse in activity. On the contrary, male patients exhibited a higher values of weight, height and body mass index and lower values of pulse at rest and pulse in activity. 
+
+Finally, the present study showed that most of the patients tend to display a similar behavior in terms of pulse at rest, pulse in activity, weight, height and body mass index according to their gender, forming mostly distinctive groups in both PCA and clustering analysis.
+
