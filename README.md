@@ -112,15 +112,15 @@ Thus, we may conclude that the current PCA analysis was successful in to capture
 Afterwards, a cluster analysis was performed to the data. To do so, first, hierarchical cluster analyses using several linkages methods were applied in order to select the most suitable number of clusters.
 
 <p align="center">
-	<img src="Images/Fig7_DendrogramCompLink.png?raw=true" width=60% height=60%>
+	<img src="Images/Fig7_DendrogramCompLink.png?raw=true" width=70% height=70%>
 </p>
 
 <p align="center">
-	<img src="Images/Fig8_DendrogramAveLink.png?raw=true" width=60% height=60%>
+	<img src="Images/Fig8_DendrogramAveLink.png?raw=true" width=70% height=70%>
 </p>
 
 <p align="center">
-	<img src="Images/Fig9_DendrogramSinLink.png?raw=true" width=60% height=60%>
+	<img src="Images/Fig9_DendrogramSinLink.png?raw=true" width=70% height=70%>
 </p>
 
 From the three dendrograms plotted above, the ones that generates the most distinguishable clusters were the ones constructed with the Complete Linkage and the Average Linkage methods, yielding about 8 and 7 subgroups, respectively. On the other hand, in the Single Linkage method it is not possible to easily differentiate the clusters so it will be discarded from further analysis. 
@@ -152,7 +152,7 @@ Clusters | Female patients | Male patients
 And the following labeled dendrogram according to the gender of each patient was generated:
 
 <p align="center">
-	<img src="Images/Fig10_DendrogramGender.png?raw=true" width=60% height=60%>
+	<img src="Images/Fig10_DendrogramGender.png?raw=true" width=70% height=70%>
 </p>
 
 After selecting the number of clusters from the Hierarchical Cluster Analysis, the K-means Cluster Analysis was applied with 8 clusters. Then, the gender of the patients was examined by cluster. 
@@ -186,7 +186,7 @@ K-meams cluster | Hierarchical cluster 1 | Hierarchical cluster 2 | Hierarchical
 Finally, a Hierarchical Clustering Analysis was performed based on the already calculated principal components.
 
 <p align="center">
-	<img src="Images/Fig11_DendrogramPC.png?raw=true" width=60% height=60%>
+	<img src="Images/Fig11_DendrogramPC.png?raw=true" width=70% height=70%>
 </p>
 
 From the whole cluster analysis, we can observe that the clusters generated from both the Hierarchical analysis and the K-means analysis somewhat coincide. For instance, from the former table, both methods share 20 elements in their respective cluster 2 and 14 elements in their respective cluster 4. 
