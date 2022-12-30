@@ -10,8 +10,6 @@
 
 **[LinkedIn](https://www.linkedin.com/in/daniel-eduardo-lopez)**
 
-**[Email](mailto:daniel-eduardo-lopez@outlook.com)**
-
 ____
 ### **1. Introduction**
 "The arterial pulse is the abrupt expansion of an artery resulting from the sudden ejection of blood into the aorta and its transmission throughout the arterial system." (Moran, 1990).
