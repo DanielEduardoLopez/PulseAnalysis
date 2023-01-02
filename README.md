@@ -6,9 +6,9 @@
 # Pulse Analysis
 #### By Daniel Eduardo López
 
-**[Github](https://github.com/DanielEduardoLopez)**
-
 **[LinkedIn](https://www.linkedin.com/in/daniel-eduardo-lopez)**
+
+**[Github](https://github.com/DanielEduardoLopez)**
 
 ____
 ### **1. Introduction**
