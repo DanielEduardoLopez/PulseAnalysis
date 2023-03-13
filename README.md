@@ -6,6 +6,8 @@
 # Pulse Analysis
 #### By Daniel Eduardo López
 
+**15/10/2022**
+
 **[LinkedIn](https://www.linkedin.com/in/daniel-eduardo-lopez)**
 
 **[Github](https://github.com/DanielEduardoLopez)**
