@@ -13,6 +13,21 @@
 **[Github](https://github.com/DanielEduardoLopez)**
 
 ____
+### **Contents**
+
+1. [Introduction](#intro)<br>
+2. [General Objective](#objective)<br>
+3. [Research Question](#question)<br>
+4. [Abridged Methodology](#methodology)<br>
+5. [Main Results](#results)<br>
+	5.1 [Principal Component Analysis](#pca)<br>
+	5.2 [Clustering Analysis](#clustering)<br>
+7. [Conclusions](#conclusions)<br>
+8. [Bibliography](#bibliography)<br>
+9. [Description of Files in Repository](#files)<br>
+
+____
+<a class="anchor" id="intro"></a>
 ### **1. Introduction**
 "The arterial pulse is the abrupt expansion of an artery resulting from the sudden ejection of blood into the aorta and its transmission throughout the arterial system." (Moran, 1990).
 
@@ -21,14 +36,17 @@ The importance of pulse relies in the fact that is one of the primary vital sign
 In the present project, the relationship among the **pulse at rest**, **pulse in activity**, **height**, **weight**, and **body mass index** of a group of **male** and **female** patients was assessed.
 
 ____
+<a class="anchor" id="objective"></a>
 ### **2. General Objective**
 Explore how pulse at rest, pulse in activity, height, weight, and body mass index relate among each other and with patients' gender.
 
 ____
+<a class="anchor" id="question"></a>
 ### **3. Research Question**
 How pulse at rest, pulse in activity, height, weight, and body mass index relate among each other and with patients' gender?
 
 ____
+<a class="anchor" id="methodology"></a>
 ### **4. Abridged Methodology**
 The methodology of the present study is based on Rollin’s Foundational Methodology for Data Science (Rollins, 2015).
 
@@ -39,8 +57,10 @@ The methodology of the present study is based on Rollin’s Foundational Methodo
 5) **Data modeling and evaluation**: A Principal Component Analysis (PCA) and a Clustering Analysis were performed in R. Moreover, hierarchical clustering and k-means techniques were used for the latter analysis.
 
 ___
+<a class="anchor" id="results"></a>
 ### **5. Main Results**
 
+<a class="anchor" id="pca"></a>
 #### **5.1 Principal Component Analysis**
 As a first approach, a Principal Component Analysis (PCA) was performed in order to explore the data.
 
@@ -106,7 +126,7 @@ With these relationships in mind, it would be possible, for instance, to design 
 
 Thus, we may conclude that the current PCA analysis was successful in to capture some important relationships within the observations and the gender in the data, which shows the great potential that this statistical technique have as an exploratory tool for datasets with many variables.
 
-
+<a class="anchor" id="clustering"></a>
 #### **5.2 Clustering Analysis**
 
 Afterwards, a cluster analysis was performed to the data. To do so, first, hierarchical cluster analyses using several linkages methods were applied in order to select the most suitable number of clusters.
@@ -202,6 +222,7 @@ Thus, the clustering analysis has proved to be useful in to relate some subgroup
 Please refer to the **[Complete Report](https://github.com/DanielEduardoLopez/PulseAnalysis/blob/main/PulseAnalysis.pdf)** for the full results.
 
 ___
+<a class="anchor" id="conclusions"></a>
 ### **6. Conclusions**
 Pulse at rest and pulse in activity are negatively correlated with the weight, height and body mass index in both male and female patients. 
 
@@ -210,12 +231,14 @@ On the other hand, female patients had a tendency to exhibit lower values of wei
 Finally, the present study showed that most of the patients tend to display a similar behavior in terms of pulse at rest, pulse in activity, weight, height and body mass index according to their gender, forming mostly distinctive groups in both PCA and clustering analysis.
 
 ___
+<a class="anchor" id="bibliography"></a>
 ### **7. Bibliography**
 - **Escobar-Restrepo, B., Torres-Villa, R. & Kyriacou, P. A. (2018).** Evaluation of the Linear Relationship Between Pulse Arrival Time and Blood Pressure in ICU Patients: Potential and Limitations. *Frontiers in Physiology*. 9. <a href="https://www.frontiersin.org/articles/10.3389/fphys.2018.01848">DOI: 10.3389/fphys.2018.01848</a>.
 - **Moran, J. F. (1990).** Pulse. In H. K. Walker, W. D. Hall, & J. W. Hurst (Eds.), *Clinical Methods* (pp. 98–100). Boston: Butterworths. <a href="https://www.ncbi.nlm.nih.gov/books/NBK278/">https://www.ncbi.nlm.nih.gov/books/NBK278/</a>.
 - **Rollins, J. B. (2015).** *Metodología Fundamental para la Ciencia de Datos*. Somers: IBM Corporation. Retrieved from https://www.ibm.com/downloads/cas/WKK9DX51
 
 ___
+<a class="anchor" id="files"></a>
 ### **8. Description of Files in Repository**
 File | Description 
 --- | --- 
