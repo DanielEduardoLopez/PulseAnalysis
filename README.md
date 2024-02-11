@@ -4,13 +4,11 @@
 
 
 # Pulse Analysis
-#### By Daniel Eduardo López
+#### Daniel Eduardo López
 
-**15/10/2022**
+<font size="-1"><a href="https://www.linkedin.com/in/daniel-eduardo-lopez">LinkedIn</a> | <a href="https://github.com/DanielEduardoLopez">GitHub </a></font>
 
-**[LinkedIn](https://www.linkedin.com/in/daniel-eduardo-lopez)**
-
-**[Github](https://github.com/DanielEduardoLopez)**
+**15 October 2022**
 
 ____
 ### **Contents**
